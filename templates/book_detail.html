@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+
+{% block body %}
+<img src="{{ r_book.Cagraphy }}">
+<p> title : {{r_book.title }}</p>
+<p> author : {{r_book.author }}</p>
+<p> publisher : {{r_book.publisher }}</p>
+<p> isbn : {{r_book.isbn }}</p>
+<br>
+<button type="button" onclick="history.back()">戻る</button>
+<a href="/">TOPへ</a>
+{% endblock %}

@@ -1,0 +1,17 @@
+{% extends "bootstrap/base.html" %}
+
+{% block title %}bookshelf{% endblock %}
+
+{% block content %}
+<a href="/">TOPへ</a>
+{% for d in pop %}
+<div class="container" style="margin: auto;">
+  <div class="row">  
+      <img src="{{ d.Cagraphy }}" href="/detail/{{ d.id }}" class="card-img-top"> 
+      <h4>{{ d.title }}</h4>
+      <a class="btn btn-primary" href="/delete/{{ d.id }}">delete</a>
+  </div>
+</div>
+{% endfor %}
+
+{% endblock %}

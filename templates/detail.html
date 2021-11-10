@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+
+{% block body %}
+
+<title>details</title>
+<h1>本の情報</h1>
+<ul>
+<!-- {% for key,value in data.items() %}
+  <li>{{ key }}:{{ value }}</li>
+{% endfor %} -->
+  <li>書名: {{ data.t }}</li>
+  <li>著者名: {{ data.a }}</li>
+  <li>出版者: {{ data.p }}</li>
+  <li>ISBN: {{ data.i }}</li>
+</ul>
+<img src="{{ data.C }}">
+<form action="/b" method="GET">
+  <input type="submit" value="本棚に入れる">
+<br>
+<button type="button" onclick="history.back()">戻る</button>
+{% endblock %}
