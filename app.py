@@ -5,7 +5,7 @@ from flask_bootstrap import Bootstrap
 from datetime import datetime, timedelta
 import requests
 from werkzeug.security import generate_password_hash, check_password_hash
-import os
+import isbn_loc
 import json
 
 app = Flask(__name__)
@@ -14,7 +14,8 @@ db = SQLAlchemy(app)
 bootstrap = Bootstrap(app)
 
 data = {}
-#dbの設定
+
+
 class b_db(db.Model):
   id = db.Column(db.Integer, primary_key=True, autoincrement = True)
   title = db.Column(db.String(150), nullable=False)
@@ -34,7 +35,7 @@ def get():
   isbn = request.form.get('isbn') 
   if (len(isbn) == 13) or (len(isbn) == 10):
     global data
-    data = bs(isbn)
+    data = isbn_loc.bs(isbn)
     return render_template('detail.html', data=data)
   else:
     return render_template('nlb.html')
@@ -51,7 +52,9 @@ def ret ():
   db.session.add(lo_s)
   db.session.commit()
   return redirect('/')
-#一覧表示
+
+
+
 @app.route('/bookshelf', methods=['POST', 'GET'])
 def mybook():
     pop = b_db.query.all()
@@ -65,31 +68,15 @@ def delete(id):
   db.session.delete(del_book)
   db.session.commit()
   return redirect(url_for('mybook'))
-#詳細表示
+
+
+
 @app.route('/detail/<int:id>')
 def detail(id):
   r_book = b_db.query.get(id)
   return render_template('book_detail.html', r_book=r_book)
 
-#ISBNから書籍情報を取得する
-def bs(isbn):
-  
-    apl = "https://api.openbd.jp/v1/get?isbn="
-    result = requests.get(apl + isbn)
-    res = result.json()
-    #openBDから書籍情報が返って来たらdataにぶち込みそれ以外はエラー吐く
-    try:
-      data = {
-        'i':(res[0]["summary"]["isbn"]),
-        't':(res[0]["summary"]["title"]),
-        'a':(res[0]["summary"]["author"]),
-        'p':(res[0]["summary"]["publisher"]),
-        'C':(res[0]["summary"]["cover"])
-        }
-      return data
-    except Exception as e:
-      abort(404)
-        
+    
 
 @app.errorhandler(404)
 def page_not_found(error):
@@ -97,5 +84,14 @@ def page_not_found(error):
 
 
 
+
+@app.route('/change_isbn', methods=['POST', 'GET'])
+def change_isbn():
+  number = request.form.get('isbn13')
+  number = isbn_loc.isbn_lll(number)
+  return render_template('index.html', number=number) 
+
+
+
 if __name__ == '__main__':
-  app.run()
+  app.run(debug=True)
