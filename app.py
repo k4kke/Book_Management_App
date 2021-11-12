@@ -4,6 +4,8 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_bootstrap import Bootstrap
 from datetime import datetime, timedelta
 import requests
+from requests.sessions import session
+from sqlalchemy.orm import query
 from werkzeug.security import generate_password_hash, check_password_hash
 import isbn_loc
 import json
@@ -16,13 +18,14 @@ bootstrap = Bootstrap(app)
 data = {}
 
 
-class b_db(db.Model):
+class B_db(db.Model):
+  __tablename__ = 'b_db'
   id = db.Column(db.Integer, primary_key=True, autoincrement = True)
   title = db.Column(db.String(150), nullable=False)
   author = db.Column(db.String(30))
   publisher = db.Column(db.String(50))
   Cagraphy = db.Column(db.String(100))
-  isbn = db.Column(db.Integer())
+  isbn = db.Column(db.Integer(), unique=True)
 
 
 
@@ -42,29 +45,32 @@ def get():
 
 @app.route('/b', methods=['POST', 'GET'])
 def ret ():
-  lo_s = b_db(
-    title = data.get('t'),
-    author = data.get('a'),
-    publisher = data.get('p'),
-    isbn = data.get('i'),
-    Cagraphy= data.get('C')
-  )
-  db.session.add(lo_s)
-  db.session.commit()
-  return redirect('/')
+    lo_s = B_db(
+      title = data.get('t'),
+      author = data.get('a'),
+      publisher = data.get('p'),
+      isbn = data.get('i'),
+      Cagraphy= data.get('C')
+    )
+    try:
+      db.session.add(lo_s)
+      db.session.commit()
+      return redirect('/')
+    except Exception as e:
+      abort(405)
 
 
 
 @app.route('/bookshelf', methods=['POST', 'GET'])
 def mybook():
-    pop = b_db.query.all()
+    pop = B_db.query.all()
     return render_template('bookshelf.html', pop=pop)
 
 
 #DELETE
 @app.route('/delete/<int:id>')
 def delete(id):
-  del_book = b_db.query.get(id)
+  del_book = B_db.query.get(id)
   db.session.delete(del_book)
   db.session.commit()
   return redirect(url_for('mybook'))
@@ -73,25 +79,21 @@ def delete(id):
 
 @app.route('/detail/<int:id>')
 def detail(id):
-  r_book = b_db.query.get(id)
+  r_book = B_db.query.get(id)
   return render_template('book_detail.html', r_book=r_book)
 
     
 
 @app.errorhandler(404)
-def page_not_found(error):
+def not_book(error):
   return render_template('nlb.html'), 404
 
 
-
-
-@app.route('/change_isbn', methods=['POST', 'GET'])
-def change_isbn():
-  number = request.form.get('isbn13')
-  number = isbn_loc.isbn_lll(number)
-  return render_template('index.html', number=number) 
+@app.errorhandler(405)
+def overlap_book(error):
+  return render_template('dfg.html'), 405
 
 
 
 if __name__ == '__main__':
-  app.run()
+  app.run(debug=True)

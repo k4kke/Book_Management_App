@@ -40,10 +40,5 @@ def bs(isbn):
       abort(404)
 
 
-def change_digit():
-  
-  return 
-
-        
 
 
