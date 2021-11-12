@@ -1,12 +1,8 @@
-from enum import unique
 from flask import Flask, render_template, request, redirect, url_for, abort
 from flask_sqlalchemy import SQLAlchemy
 from flask_bootstrap import Bootstrap
-from datetime import datetime, timedelta
 import requests
-from requests.sessions import session
 from sqlalchemy.orm import query
-from werkzeug.security import generate_password_hash, check_password_hash
 import isbn_loc
 import json
 
@@ -96,4 +92,5 @@ def overlap_book(error):
 
 
 if __name__ == '__main__':
-  app.run(debug=True)
+  app.run()
+  
